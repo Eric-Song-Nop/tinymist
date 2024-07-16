@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value as JsonValue;
 use task::TraceParams;
 use tinymist_assets::TYPST_PREVIEW_HTML;
-use tinymist_query::{ExportKind, PageSelection};
+use tinymist_query::{ExportImageOpts, ExportKind};
 use typst::diag::StrResult;
 use typst::syntax::package::{PackageSpec, VersionlessPackageSpec};
 use typst_ts_core::error::prelude::*;
@@ -17,11 +17,6 @@ use typst_ts_core::error::prelude::*;
 use super::server::*;
 use super::*;
 use crate::tool::package::InitTask;
-
-#[derive(Debug, Clone, Default, Deserialize)]
-struct ExportOpts {
-    page: PageSelection,
-}
 
 /// Here are implemented the handlers for each command.
 impl LanguageState {
@@ -32,14 +27,14 @@ impl LanguageState {
 
     /// Export the current document as Svg file(s).
     pub fn export_svg(&mut self, req_id: RequestId, mut args: Vec<JsonValue>) -> ScheduledResult {
-        let opts = get_arg_or_default!(args[1] as ExportOpts);
-        self.export(req_id, ExportKind::Svg { page: opts.page }, args)
+        let opts = get_arg_or_default!(args[1] as ExportImageOpts);
+        self.export(req_id, ExportKind::Svg(opts), args)
     }
 
     /// Export the current document as Png file(s).
     pub fn export_png(&mut self, req_id: RequestId, mut args: Vec<JsonValue>) -> ScheduledResult {
-        let opts = get_arg_or_default!(args[1] as ExportOpts);
-        self.export(req_id, ExportKind::Png { page: opts.page }, args)
+        let opts = get_arg_or_default!(args[1] as ExportImageOpts);
+        self.export(req_id, ExportKind::Png(opts), args)
     }
 
     /// Export the current document as some format. The client is responsible

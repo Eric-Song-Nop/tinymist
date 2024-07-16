@@ -135,6 +135,11 @@ mod polymorphic {
     use super::prelude::*;
     use super::*;
 
+    #[derive(Debug, Clone, Default, Deserialize)]
+    pub struct ExportImageOpts {
+        pub page: PageSelection,
+    }
+
     #[derive(Default, Debug, Clone, Copy, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub enum PageSelection {
@@ -147,20 +152,16 @@ mod polymorphic {
     pub enum ExportKind {
         #[default]
         Pdf,
-        Svg {
-            page: PageSelection,
-        },
-        Png {
-            page: PageSelection,
-        },
+        Svg(ExportImageOpts),
+        Png(ExportImageOpts),
     }
 
     impl ExportKind {
         pub fn extension(&self) -> &str {
             match self {
                 Self::Pdf => "pdf",
-                Self::Svg { .. } => "svg",
-                Self::Png { .. } => "png",
+                Self::Svg(..) => "svg",
+                Self::Png(..) => "png",
             }
         }
     }

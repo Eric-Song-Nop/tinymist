@@ -4,7 +4,7 @@ use std::{path::PathBuf, sync::Arc};
 
 use anyhow::{bail, Context};
 use once_cell::sync::Lazy;
-use tinymist_query::{ExportKind, PageSelection};
+use tinymist_query::{ExportImageOpts, ExportKind, PageSelection};
 use tokio::{sync::mpsc, task::spawn_blocking};
 use typst::{foundations::Smart, layout::Abs, layout::Frame, visualize::Color};
 use typst_ts_compiler::{EntryReader, EntryState, TaskInputs};
@@ -199,12 +199,18 @@ impl ExportConfig {
                         // todo: timestamp world.now()
                         typst_pdf::pdf(doc, Smart::Auto, None)
                     }
-                    Svg { page: First } => typst_svg::svg(first_frame()).into_bytes(),
-                    Svg { page: Merged } => typst_svg::svg_merged(doc, Abs::zero()).into_bytes(),
-                    Png { page: First } => typst_render::render(first_frame(), 3., Color::WHITE)
-                        .encode_png()
-                        .map_err(|err| anyhow::anyhow!("failed to encode PNG ({err})"))?,
-                    Png { page: Merged } => typst_render::render_merged(
+                    Svg(ExportImageOpts { page: First }) => {
+                        typst_svg::svg(first_frame()).into_bytes()
+                    }
+                    Svg(ExportImageOpts { page: Merged }) => {
+                        typst_svg::svg_merged(doc, Abs::zero()).into_bytes()
+                    }
+                    Png(ExportImageOpts { page: First }) => {
+                        typst_render::render(first_frame(), 3., Color::WHITE)
+                            .encode_png()
+                            .map_err(|err| anyhow::anyhow!("failed to encode PNG ({err})"))?
+                    }
+                    Png(ExportImageOpts { page: Merged }) => typst_render::render_merged(
                         doc,
                         3.,
                         Color::WHITE,

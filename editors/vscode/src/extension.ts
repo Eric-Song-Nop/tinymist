@@ -44,7 +44,7 @@ export function activate(context: ExtensionContext): Promise<void> {
   vscode.commands.executeCommand("setContext", "ext.tinymistActivated", true);
 
   let config: Record<string, any> = JSON.parse(
-    JSON.stringify(workspace.getConfiguration("tinymist"))
+    JSON.stringify(workspace.getConfiguration("tinymist")),
   );
   config.preferredTheme = "light";
 
@@ -67,7 +67,7 @@ export function activate(context: ExtensionContext): Promise<void> {
     const typstPreviewExtension = vscode.extensions.getExtension("mgt19937.typst-preview");
     if (typstPreviewExtension) {
       void vscode.window.showWarningMessage(
-        "Tinymist Says:\n\nTypst Preview extension is already integrated into Tinymist. Please disable Typst Preview extension to avoid conflicts."
+        "Tinymist Says:\n\nTypst Preview extension is already integrated into Tinymist. Please disable Typst Preview extension to avoid conflicts.",
       );
     }
   }
@@ -119,7 +119,7 @@ export function activate(context: ExtensionContext): Promise<void> {
 
     const devKitProvider = new DevKitProvider();
     context.subscriptions.push(
-      vscode.window.registerTreeDataProvider("tinymist.dev-kit", devKitProvider)
+      vscode.window.registerTreeDataProvider("tinymist.dev-kit", devKitProvider),
     );
   }
 
@@ -174,7 +174,7 @@ function initClient(context: ExtensionContext, config: Record<string, any>) {
     "tinymist",
     "Tinymist Typst Language Server",
     serverOptions,
-    clientOptions
+    clientOptions,
   );
 }
 
@@ -199,7 +199,7 @@ async function startClient(client: LanguageClient, context: ExtensionContext): P
       "active",
       window.activeTextEditor !== undefined,
       "documents",
-      vscode.workspace.textDocuments.map((doc) => doc.uri.fsPath)
+      vscode.workspace.textDocuments.map((doc) => doc.uri.fsPath),
     );
 
     if (jump.start === null || jump.end === null) {
@@ -247,7 +247,7 @@ async function startClient(client: LanguageClient, context: ExtensionContext): P
         return commandActivateDoc(undefined);
       }
       return commandActivateDoc(editor?.document);
-    })
+    }),
   );
   context.subscriptions.push(
     vscode.workspace.onDidOpenTextDocument((doc: vscode.TextDocument) => {
@@ -258,7 +258,7 @@ async function startClient(client: LanguageClient, context: ExtensionContext): P
           return commandActivateDoc(undefined);
         }
       }
-    })
+    }),
   );
   context.subscriptions.push(
     vscode.workspace.onDidCloseTextDocument((doc: vscode.TextDocument) => {
@@ -266,7 +266,7 @@ async function startClient(client: LanguageClient, context: ExtensionContext): P
         focusingDoc = undefined;
         commandActivateDoc(undefined);
       }
-    })
+    }),
   );
 
   context.subscriptions.push(
@@ -274,7 +274,7 @@ async function startClient(client: LanguageClient, context: ExtensionContext): P
 
     commands.registerCommand("tinymist.exportCurrentPdf", () => commandExport("Pdf")),
     commands.registerCommand("tinymist.getCurrentDocumentMetrics", () =>
-      commandGetCurrentDocumentMetrics()
+      commandGetCurrentDocumentMetrics(),
     ),
     commands.registerCommand("tinymist.pinMainToCurrent", () => commandPinMain(true)),
     commands.registerCommand("tinymist.unpinMain", () => commandPinMain(false)),
@@ -284,13 +284,13 @@ async function startClient(client: LanguageClient, context: ExtensionContext): P
     commands.registerCommand("tinymist.clearCache", commandClearCache),
     commands.registerCommand("tinymist.runCodeLens", commandRunCodeLens),
     commands.registerCommand("tinymist.initTemplate", (...args) =>
-      commandInitTemplate(context, false, ...args)
+      commandInitTemplate(context, false, ...args),
     ),
     commands.registerCommand("tinymist.initTemplateInPlace", (...args) =>
-      commandInitTemplate(context, true, ...args)
+      commandInitTemplate(context, true, ...args),
     ),
     commands.registerCommand("tinymist.showTemplateGallery", () =>
-      commandShowTemplateGallery(context)
+      commandShowTemplateGallery(context),
     ),
     commands.registerCommand("tinymist.showSummary", () => commandShowSummary(context)),
     commands.registerCommand("tinymist.showSymbolView", () => commandShowSymbolView(context)),
@@ -302,12 +302,12 @@ async function startClient(client: LanguageClient, context: ExtensionContext): P
       if (client) {
         client.outputChannel.show();
       }
-    })
+    }),
   );
   // context.subscriptions.push
   const provider = new SymbolViewProvider(context);
   context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider("tinymist.side-symbol-view", provider)
+    vscode.window.registerWebviewViewProvider("tinymist.side-symbol-view", provider),
   );
 
   await client.start();
@@ -357,7 +357,7 @@ async function startClient(client: LanguageClient, context: ExtensionContext): P
       client?.sendNotification("textDocument/didClose", {
         textDocument: client.code2ProtocolConverter.asTextDocumentIdentifier(doc),
       });
-    })
+    }),
   );
   for (const doc of vscode.workspace.textDocuments) {
     if (!isInterestingNonTypst(doc)) {
@@ -394,7 +394,7 @@ export function getServer(serverPath: string): string {
     const validation = validateServer(serverPath);
     if (!validation.valid) {
       throw new Error(
-        `\`tinymist.serverPath\` (${serverPath}) does not point to a valid tinymist binary:\n${validation.message}`
+        `\`tinymist.serverPath\` (${serverPath}) does not point to a valid tinymist binary:\n${validation.message}`,
       );
     }
     return serverPath;
@@ -416,12 +416,12 @@ export function getServer(serverPath: string): string {
   }
 
   throw new Error(
-    `Could not find a valid tinymist binary.\nBundled: ${bundledValidation.message}\nIn PATH: ${binaryValidation.message}`
+    `Could not find a valid tinymist binary.\nBundled: ${bundledValidation.message}\nIn PATH: ${binaryValidation.message}`,
   );
 }
 
 function validateServer(
-  path: string
+  path: string,
 ): { valid: true; message: string } | { valid: false; message: string } {
   try {
     console.log("validate", path, "args", ["probe"]);
@@ -455,7 +455,7 @@ function activeTypstEditor() {
 }
 
 export const onEnter = new lc.RequestType<lc.TextDocumentPositionParams, lc.TextEdit[], void>(
-  "experimental/onEnter"
+  "experimental/onEnter",
 );
 
 export function onEnterHandler() {
@@ -686,7 +686,7 @@ async function commandInitTemplate(
       initArgs.push(...args);
     } else if (args.length > 0) {
       await vscode.window.showErrorMessage(
-        "Invalid arguments for initTemplate, needs either all arguments or zero arguments"
+        "Invalid arguments for initTemplate, needs either all arguments or zero arguments",
       );
       return;
     } else {
@@ -729,7 +729,7 @@ async function commandInitTemplate(
       initArgs.push(...args);
     } else if (args.length > 0) {
       await vscode.window.showErrorMessage(
-        "Invalid arguments for initTemplateInPlace, needs either all arguments or zero arguments"
+        "Invalid arguments for initTemplateInPlace, needs either all arguments or zero arguments",
       );
       return;
     } else {
@@ -810,7 +810,7 @@ async function commandActivateDoc(doc: vscode.TextDocument | undefined): Promise
 
 async function commandActivateDocPath(
   doc: vscode.TextDocument | undefined,
-  fsPath: string | undefined
+  fsPath: string | undefined,
 ): Promise<void> {
   // console.log("focus main", fsPath, new Error().stack);
   focusingFile = fsPath;
@@ -874,7 +874,7 @@ async function commandRunCodeLens(...args: string[]): Promise<void> {
         [FastKind.PDF, FastKind.SVG, FastKind.SVGMerged, FastKind.PNG, FastKind.PNGMerged],
         {
           title: "Format to export as",
-        }
+        },
       );
 
       switch (fmt) {
@@ -993,7 +993,7 @@ class DevKitProvider implements vscode.TreeDataProvider<DevKitItem> {
 export class DevKitItem extends vscode.TreeItem {
   constructor(
     public readonly command: vscode.Command,
-    public description = ""
+    public description = "",
   ) {
     super(command.title, vscode.TreeItemCollapsibleState.None);
     this.tooltip = this.command.tooltip || ``;
